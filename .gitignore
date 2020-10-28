@@ -9,7 +9,11 @@
 !/.gitattributes
 !/.gitignore
 !/.github
-!/Dockerfile
+!/.npmrc
+!/package.json
+!/docker-compose.yml
+!/src
+!/test
 
 # But make sure to ignore these regardless:
 *.lnk
