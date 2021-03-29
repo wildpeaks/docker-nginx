@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "devDependencies": {
+    "express": "4.17.1",
+    "got": "11.8.2",
+    "mocha": "8.3.2"
+  },
+  "scripts": {
+    "test": "mocha test/mocha/*.test.js --timeout 5000"
+  }
+}

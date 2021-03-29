@@ -1,0 +1,53 @@
+version: "3.8"
+services:
+
+  src:
+    build: ./src
+    volumes:
+    - logs:/shared
+    - ./test/nginx/.htpasswd:/etc/nginx/sites-enabled/.htpasswd:ro
+    - ./test/nginx/index/www:/var/www/index:ro
+    - ./test/nginx/index/nginx.conf:/etc/nginx/sites-enabled/index.conf:ro
+    - ./test/nginx/logs/www:/var/www/logs:ro
+    - ./test/nginx/logs/nginx.conf:/etc/nginx/sites-enabled/logs.conf:ro
+    - ./test/nginx/proxy_pass/nginx.conf:/etc/nginx/sites-enabled/proxy_pass.conf:ro
+    - ./test/nginx/proxy_redirect/nginx.conf:/etc/nginx/sites-enabled/proxy_redirect.conf:ro
+    - ./test/nginx/rewrite/nginx.conf:/etc/nginx/sites-enabled/rewrite.conf:ro
+    - ./test/nginx/status/www:/var/www/status:ro
+    - ./test/nginx/status/nginx.conf:/etc/nginx/sites-enabled/status.conf:ro
+    - ./test/nginx/try_files/www:/var/www/try_files:ro
+    - ./test/nginx/try_files/nginx.conf:/etc/nginx/sites-enabled/try_files.conf:ro
+    ports:
+    - 80:80
+    networks:
+      default:
+        aliases:
+        - fake.local
+        - index.local
+        - logs.local
+        - obsolete.local
+        - proxy_pass.local
+        - proxy_redirect.local
+        - status.local
+        - try_files.local
+        - rewrite.local
+        - www.rewrite.local
+
+  test:
+    image: node:14-alpine
+    command: tail -f /dev/null
+    working_dir: /app
+    volumes:
+    - logs:/shared
+    - ./.npmrc:/app/.npmrc:ro
+    - ./package.json:/app/package.json:ro
+    - ./test/mocha:/app/test/mocha:ro
+    ports:
+      - 3000:3000
+    networks:
+      default:
+        aliases:
+        - test.local
+
+volumes:
+  logs:
