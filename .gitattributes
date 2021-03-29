@@ -5,4 +5,10 @@
 .gitignore      text
 *.md            text
 *.yml           text
+
 Dockerfile      text
+*.conf          text
+
+*.html          text
+*.js            text
+*.css           text

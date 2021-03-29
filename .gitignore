@@ -9,7 +9,6 @@
 !/.gitattributes
 !/.gitignore
 !/.github
-!/.npmrc
 !/package.json
 !/docker-compose.yml
 !/src
