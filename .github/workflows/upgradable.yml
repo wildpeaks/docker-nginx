@@ -1,0 +1,14 @@
+name: Upgradable
+on:
+  workflow_dispatch:
+jobs:
+  apt:
+    timeout-minutes: 10
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v1
+    - run: docker-compose build src
+    - run: docker-compose up -d src
+    - run: docker-compose exec src apt list --upgradable
+    - run: docker-compose down --volumes
+      if: always()
