@@ -3,6 +3,8 @@ services:
 
   src:
     build: ./src
+    depends_on:
+      - test
     volumes:
     - logs:/shared
     - ./test/nginx/.htpasswd:/etc/nginx/sites-enabled/.htpasswd:ro
@@ -10,8 +12,6 @@ services:
     - ./test/nginx/index/nginx.conf:/etc/nginx/sites-enabled/index.conf:ro
     - ./test/nginx/logs/www:/var/www/logs:ro
     - ./test/nginx/logs/nginx.conf:/etc/nginx/sites-enabled/logs.conf:ro
-    - ./test/nginx/proxy_pass/nginx.conf:/etc/nginx/sites-enabled/proxy_pass.conf:ro
-    - ./test/nginx/proxy_redirect/nginx.conf:/etc/nginx/sites-enabled/proxy_redirect.conf:ro
     - ./test/nginx/rewrite/nginx.conf:/etc/nginx/sites-enabled/rewrite.conf:ro
     - ./test/nginx/status/www:/var/www/status:ro
     - ./test/nginx/status/nginx.conf:/etc/nginx/sites-enabled/status.conf:ro
@@ -34,12 +34,11 @@ services:
         - www.rewrite.local
 
   test:
-    image: node:14-alpine
+    image: node:16-alpine
     command: tail -f /dev/null
     working_dir: /app
     volumes:
     - logs:/shared
-    - ./.npmrc:/app/.npmrc:ro
     - ./package.json:/app/package.json:ro
     - ./test/mocha:/app/test/mocha:ro
     ports:
