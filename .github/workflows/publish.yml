@@ -31,9 +31,10 @@ jobs:
         echo Tag ${{ steps.deployment.outputs.tag }}
 
     - name: Docker
+      working-directory: ./src
       run: |
         echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USER }}" --password-stdin
-        docker build . --file src/Dockerfile --tag ${{ secrets.DOCKER_HUB_REPO }}:${{ steps.deployment.outputs.tag }}
+        docker build . --tag ${{ secrets.DOCKER_HUB_REPO }}:${{ steps.deployment.outputs.tag }}
         docker push ${{ secrets.DOCKER_HUB_REPO }}:${{ steps.deployment.outputs.tag }}
 
     - name: On success
