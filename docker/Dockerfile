@@ -1,10 +1,11 @@
 FROM ubuntu:20.04
 
+COPY dependencies.json /tmp/dependencies.json
+
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
- && apt-get install -y --no-install-recommends \
-      nginx=1.18.0-0ubuntu1 \
-      openssl=1.1.1f-1ubuntu2.4 \
-      ca-certificates=20210119~20.04.1 \
+ && apt-get install -y --no-install-recommends jq \
+ && jq -r 'to_entries | .[] | .key + "=" + .value' /tmp/dependencies.json | xargs apt-get install -y --no-install-recommends \
+ && rm /tmp/dependencies.json \
  && apt-get clean \
  && rm /etc/nginx/sites-enabled/default \
  && rm /etc/nginx/sites-available/default \
