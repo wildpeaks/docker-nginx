@@ -2,7 +2,7 @@ version: "3.8"
 services:
 
   src:
-    build: ./src
+    build: ./docker
     volumes:
     - logs:/shared
     - ./test/nginx/.htpasswd:/etc/nginx/sites-enabled/.htpasswd:ro

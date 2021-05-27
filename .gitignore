@@ -11,7 +11,7 @@
 !/.github
 !/package.json
 !/docker-compose.yml
-!/src
+!/docker
 !/test
 
 # But make sure to ignore these regardless:
