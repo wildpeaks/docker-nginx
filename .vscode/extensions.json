@@ -1,0 +1,8 @@
+{
+	"recommendations": [
+		"EditorConfig.editorconfig",
+		"ms-azuretools.vscode-docker",
+		"redhat.vscode-yaml",
+		"william-voyek.vscode-nginx"
+	]
+}

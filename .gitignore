@@ -9,6 +9,7 @@
 !/.gitattributes
 !/.gitignore
 !/.github
+!/.vscode
 !/package.json
 !/docker-compose.yml
 !/docker
