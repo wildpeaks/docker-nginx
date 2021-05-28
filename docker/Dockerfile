@@ -6,6 +6,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
  && apt-get install -y --no-install-recommends jq \
  && jq -r 'to_entries | .[] | .key + "=" + .value' /tmp/dependencies.json | xargs apt-get install -y --no-install-recommends \
  && rm /tmp/dependencies.json \
+ && apt-get purge -y jq \
  && apt-get clean \
  && rm /etc/nginx/sites-enabled/default \
  && rm /etc/nginx/sites-available/default \
