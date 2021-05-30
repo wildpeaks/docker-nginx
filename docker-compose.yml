@@ -41,12 +41,6 @@ services:
     - logs:/shared
     - ./package.json:/app/package.json:ro
     - ./test/mocha:/app/test/mocha:ro
-    ports:
-      - 3000:3000
-    networks:
-      default:
-        aliases:
-        - test.local
 
 volumes:
   logs:
