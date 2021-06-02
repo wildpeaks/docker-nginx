@@ -2,134 +2,134 @@
 /* eslint-disable prefer-arrow-callback */
 "use strict";
 const {strictEqual} = require("assert");
-const {get} = require("./shared");
+const fetch = require("node-fetch");
 
 describe("Redirection", function () {
 	it("/redirection", async function () {
-		const actual = await get("http://try_files.local/redirection");
-		strictEqual(actual.statusCode, 301);
-		strictEqual(actual.headers["location"], "http://try_files.local/redirection/");
+		const actual = await fetch("http://try_files.local/redirection", {redirect: "manual"});
+		strictEqual(actual.status, 301);
+		strictEqual(actual.headers.get("location"), "http://try_files.local/redirection/");
 	});
 	it("/redirection/", async function () {
-		const actual = await get("http://try_files.local/redirection/");
-		strictEqual(actual.statusCode, 403);
+		const actual = await fetch("http://try_files.local/redirection/", {redirect: "manual"});
+		strictEqual(actual.status, 403);
 	});
 	it("/redirection/hello.txt", async function () {
-		const actual = await get("http://try_files.local/redirection/hello.txt");
-		strictEqual(actual.statusCode, 200);
+		const actual = await fetch("http://try_files.local/redirection/hello.txt", {redirect: "manual"});
+		strictEqual(actual.status, 200);
 	});
 	it("/@fallback", async function () {
-		const actual = await get("http://try_files.local/@fallback");
-		strictEqual(actual.statusCode, 404);
+		const actual = await fetch("http://try_files.local/@fallback", {redirect: "manual"});
+		strictEqual(actual.status, 404);
 	});
 	it("/@fallback/", async function () {
-		const actual = await get("http://try_files.local/@fallback/");
-		strictEqual(actual.statusCode, 404);
+		const actual = await fetch("http://try_files.local/@fallback/", {redirect: "manual"});
+		strictEqual(actual.status, 404);
 	});
 	it("/@another", async function () {
-		const actual = await get("http://try_files.local/@another");
-		strictEqual(actual.statusCode, 301);
-		strictEqual(actual.headers["location"], "http://try_files.local/@another/");
+		const actual = await fetch("http://try_files.local/@another", {redirect: "manual"});
+		strictEqual(actual.status, 301);
+		strictEqual(actual.headers.get("location"), "http://try_files.local/@another/");
 	});
 	it("/@another/", async function () {
-		const actual = await get("http://try_files.local/@another/");
-		strictEqual(actual.statusCode, 200);
+		const actual = await fetch("http://try_files.local/@another/", {redirect: "manual"});
+		strictEqual(actual.status, 200);
 	});
 });
 
 describe("Filenames", function () {
 	it("Space: None", async function () {
-		const actual = await get("http://try_files.local/filenames/helloworld.html");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, "<html><body>helloworld.html</body></html>\n");
+		const actual = await fetch("http://try_files.local/filenames/helloworld.html", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(await actual.text(), "<html><body>helloworld.html</body></html>\n");
 	});
 	it("Space: Raw", async function () {
-		const actual = await get("http://try_files.local/filenames/hello world.html");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, "<html><body>hello world.html</body></html>\n");
+		const actual = await fetch("http://try_files.local/filenames/hello world.html", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(await actual.text(), "<html><body>hello world.html</body></html>\n");
 	});
 	it("Space: Encoded", async function () {
-		const actual = await get("http://try_files.local/filenames/hello%20world.html");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, "<html><body>hello world.html</body></html>\n");
+		const actual = await fetch("http://try_files.local/filenames/hello%20world.html", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(await actual.text(), "<html><body>hello world.html</body></html>\n");
 	});
 	it("Plus", async function () {
-		const actual = await get("http://try_files.local/filenames/hello+world.html");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, "<html><body>hello+world.html</body></html>\n");
+		const actual = await fetch("http://try_files.local/filenames/hello+world.html", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(await actual.text(), "<html><body>hello+world.html</body></html>\n");
 	});
 	it("Dot", async function () {
-		const actual = await get("http://try_files.local/filenames/hello.world.html");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, "<html><body>hello.world.html</body></html>\n");
+		const actual = await fetch("http://try_files.local/filenames/hello.world.html", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(await actual.text(), "<html><body>hello.world.html</body></html>\n");
 	});
 	it("Accents", async function () {
-		const actual = await get("http://try_files.local/filenames/àéèê.html");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, "<html><body>àéèê.html</body></html>\n");
+		const actual = await fetch(encodeURI("http://try_files.local/filenames/àéèê.html"), {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(await actual.text(), "<html><body>àéèê.html</body></html>\n");
 	});
 	it("Emojis", async function () {
-		const actual = await get("http://try_files.local/filenames/🐳.html");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, "<html><body>🐳.html</body></html>\n");
+		const actual = await fetch(encodeURI("http://try_files.local/filenames/🐳.html"), {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(await actual.text(), "<html><body>🐳.html</body></html>\n");
 	});
 });
 
 describe("Mimetypes", function () {
 	it("HTML", async function () {
-		const actual = await get("http://try_files.local/mimetypes/text.html");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, "<html><body>text.html</body></html>\n");
-		strictEqual(actual.headers["content-type"], "text/html");
+		const actual = await fetch("http://try_files.local/mimetypes/text.html", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(actual.headers.get("content-type"), "text/html");
+		strictEqual(await actual.text(), "<html><body>text.html</body></html>\n");
 	});
 	it("TXT", async function () {
-		const actual = await get("http://try_files.local/mimetypes/text.txt");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, "text.txt\n");
-		strictEqual(actual.headers["content-type"], "text/plain");
+		const actual = await fetch("http://try_files.local/mimetypes/text.txt", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(actual.headers.get("content-type"), "text/plain");
+		strictEqual(await actual.text(), "text.txt\n");
 	});
 	it("CSS", async function () {
-		const actual = await get("http://try_files.local/mimetypes/text.css");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, "/* text.css */\n");
-		strictEqual(actual.headers["content-type"], "text/css");
+		const actual = await fetch("http://try_files.local/mimetypes/text.css", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(actual.headers.get("content-type"), "text/css");
+		strictEqual(await actual.text(), "/* text.css */\n");
 	});
 	it("JS", async function () {
-		const actual = await get("http://try_files.local/mimetypes/text.js");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, "/* text.js */\n");
-		strictEqual(actual.headers["content-type"], "application/javascript");
+		const actual = await fetch("http://try_files.local/mimetypes/text.js", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(actual.headers.get("content-type"), "application/javascript");
+		strictEqual(await actual.text(), "/* text.js */\n");
 	});
 	it("CSS MAP", async function () {
-		const actual = await get("http://try_files.local/mimetypes/text.css.map");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, `{"source": "text.css"}\n`);
-		strictEqual(actual.headers["content-type"], "application/json");
+		const actual = await fetch("http://try_files.local/mimetypes/text.css.map", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(actual.headers.get("content-type"), "application/json");
+		strictEqual(await actual.text(), `{"source": "text.css"}\n`);
 	});
 	it("JS MAP", async function () {
-		const actual = await get("http://try_files.local/mimetypes/text.js.map");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, `{"source": "text.js"}\n`);
-		strictEqual(actual.headers["content-type"], "application/json");
+		const actual = await fetch("http://try_files.local/mimetypes/text.js.map", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(actual.headers.get("content-type"), "application/json");
+		strictEqual(await actual.text(), `{"source": "text.js"}\n`);
 	});
 	it("JPEG", async function () {
-		const actual = await get("http://try_files.local/mimetypes/image.jpg");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.headers["content-type"], "image/jpeg");
+		const actual = await fetch("http://try_files.local/mimetypes/image.jpg", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(actual.headers.get("content-type"), "image/jpeg");
 	});
 	it("PNG", async function () {
-		const actual = await get("http://try_files.local/mimetypes/image.png");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.headers["content-type"], "image/png");
+		const actual = await fetch("http://try_files.local/mimetypes/image.png", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(actual.headers.get("content-type"), "image/png");
 	});
 	it("GIF", async function () {
-		const actual = await get("http://try_files.local/mimetypes/image.gif");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.headers["content-type"], "image/gif");
+		const actual = await fetch("http://try_files.local/mimetypes/image.gif", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(actual.headers.get("content-type"), "image/gif");
 	});
 	it("SVG", async function () {
-		const actual = await get("http://try_files.local/mimetypes/image.svg");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.headers["content-type"], "image/svg+xml");
+		const actual = await fetch("http://try_files.local/mimetypes/image.svg", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(actual.headers.get("content-type"), "image/svg+xml");
 	});
 });
