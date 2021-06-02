@@ -3,7 +3,8 @@
 "use strict";
 const {strictEqual, deepStrictEqual} = require("assert");
 const {readdir, readFile} = require("fs/promises");
-const {auth, get} = require("./shared");
+const fetch = require("node-fetch");
+
 
 describe("Logs", function () {
 	it("Custom filepaths", async function () {
@@ -12,18 +13,18 @@ describe("Logs", function () {
 	});
 	it("access_log", async function () {
 		const before = await readFile("/shared/custom.access", "utf8");
-		/* const response0 = */ await get("http://logs.local/log-root.html");
-		/* const response1 = */ await get("http://logs.local/bad.html");
-		/* const response2 = */ await get("http://logs.local/200");
-		/* const response3 = */ await get("http://logs.local/301");
-		/* const response4 = */ await get("http://logs.local/404");
-		/* const response5 = */ await get("http://logs.local/500");
-		/* const response6 = */ await get("http://logs.local/access-not-logged/log-access.html");
-		/* const response7 = */ await get("http://logs.local/access-not-logged/bad.html");
-		/* const response8 = */ await get("http://logs.local/error-not-logged/log-error.html");
-		/* const response9 = */ await get("http://logs.local/error-not-logged/bad.html");
-		/* const response10 =*/ await get("http://logs.local/notfound-not-logged/log-notfound.html");
-		/* const response11 =*/ await get("http://logs.local/notfound-not-logged/bad.html");
+		/* const response0 = */ await fetch("http://logs.local/log-root.html", {redirect: "manual"});
+		/* const response1 = */ await fetch("http://logs.local/bad.html", {redirect: "manual"});
+		/* const response2 = */ await fetch("http://logs.local/200", {redirect: "manual"});
+		/* const response3 = */ await fetch("http://logs.local/301", {redirect: "manual"});
+		/* const response4 = */ await fetch("http://logs.local/404", {redirect: "manual"});
+		/* const response5 = */ await fetch("http://logs.local/500", {redirect: "manual"});
+		/* const response6 = */ await fetch("http://logs.local/access-not-logged/log-access.html", {redirect: "manual"});
+		/* const response7 = */ await fetch("http://logs.local/access-not-logged/bad.html", {redirect: "manual"});
+		/* const response8 = */ await fetch("http://logs.local/error-not-logged/log-error.html", {redirect: "manual"});
+		/* const response9 = */ await fetch("http://logs.local/error-not-logged/bad.html", {redirect: "manual"});
+		/* const response10 =*/ await fetch("http://logs.local/notfound-not-logged/log-notfound.html", {redirect: "manual"});
+		/* const response11 =*/ await fetch("http://logs.local/notfound-not-logged/bad.html", {redirect: "manual"});
 		const after = await readFile("/shared/custom.access", "utf8");
 		const delta = after.substr(before.length);
 		strictEqual(delta.includes("GET /200"), true, "Status 200 is logged");
@@ -41,12 +42,22 @@ describe("Logs", function () {
 	});
 	it("error_log", async function () {
 		const before = await readFile("/shared/custom.error", "utf8");
-		const actual1 = await get("http://logs.local/auth/log-no-credentials.html");
-		const actual2 = await auth("http://logs.local/auth/log-bad-username.html", "bad", "bad");
-		const actual3 = await auth("http://logs.local/auth/log-bad-password.html", "hello", "bad");
-		strictEqual(actual1.statusCode, 401, "No credentials");
-		strictEqual(actual2.statusCode, 401, "Bad username");
-		strictEqual(actual3.statusCode, 401, "Bad password");
+		const actual1 = await fetch("http://logs.local/auth/log-no-credentials.html", {redirect: "manual"});
+		const actual2 = await fetch("http://logs.local/auth/log-bad-username.html", {
+			redirect: "manual",
+			headers: {
+				"Authorization": "Basic " + Buffer.from("bad:bad").toString("base64")
+			}
+		});
+		const actual3 = await fetch("http://logs.local/auth/log-bad-password.html", {
+			redirect: "manual",
+			headers: {
+				"Authorization": "Basic " + Buffer.from("hello:bad").toString("base64")
+			}
+		});
+		strictEqual(actual1.status, 401, "No credentials");
+		strictEqual(actual2.status, 401, "Bad username");
+		strictEqual(actual3.status, 401, "Bad password");
 		const after = await readFile("/shared/custom.error", "utf8");
 		const delta = after.substr(before.length);
 		strictEqual(delta.includes("GET /auth/log-no-credentials.html"), false, "Missing both isn't logged");

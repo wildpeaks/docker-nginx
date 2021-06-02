@@ -2,68 +2,56 @@
 /* eslint-disable prefer-arrow-callback */
 "use strict";
 const {strictEqual} = require("assert");
-const {get} = require("./shared");
+const fetch = require("node-fetch");
 
 describe("index", function () {
 	it("Root", async function () {
-		this.slow(5000);
-		this.timeout(5000);
-		const actual1 = await get("http://index.local/");
-		const actual2 = await get("http://index.local");
-		strictEqual(actual1.statusCode, 200);
-		strictEqual(actual2.statusCode, 200);
-		strictEqual(actual1.body, "<html><body>index.html</body></html>\n");
-		strictEqual(actual2.body, "<html><body>index.html</body></html>\n");
-		strictEqual(actual1.headers["content-type"], "text/html");
-		strictEqual(actual2.headers["content-type"], "text/html");
+		const actual1 = await fetch("http://index.local/", {redirect: "manual"});
+		const actual2 = await fetch("http://index.local", {redirect: "manual"});
+		strictEqual(actual1.status, 200);
+		strictEqual(actual2.status, 200);
+		strictEqual(actual1.headers.get("content-type"), "text/html");
+		strictEqual(actual2.headers.get("content-type"), "text/html");
+		strictEqual(await actual1.text(), "<html><body>index.html</body></html>\n");
+		strictEqual(await actual2.text(), "<html><body>index.html</body></html>\n");
 	});
 
 	it("Subfolder", async function () {
-		this.slow(5000);
-		this.timeout(5000);
+		const actual1 = await fetch("http://index.local/subfolder1/", {redirect: "manual"});
+		strictEqual(actual1.status, 200);
+		strictEqual(actual1.headers.get("content-type"), "text/html");
+		strictEqual(await actual1.text(), "<html><body>subfolder/index.html</body></html>\n");
 
-		const actual1 = await get("http://index.local/subfolder1/");
-		strictEqual(actual1.statusCode, 200);
-		strictEqual(actual1.body, "<html><body>subfolder/index.html</body></html>\n");
-		strictEqual(actual1.headers["content-type"], "text/html");
-
-		const actual2 = await get("http://index.local/subfolder1");
-		strictEqual(actual2.statusCode, 301);
-		strictEqual(actual2.headers["location"], "http://index.local/subfolder1/");
+		const actual2 = await fetch("http://index.local/subfolder1", {redirect: "manual"});
+		strictEqual(actual2.status, 301);
+		strictEqual(actual2.headers.get("location"), "http://index.local/subfolder1/");
 	});
 
 	it("Per-location override", async function () {
-		this.slow(5000);
-		this.timeout(5000);
-		const actual = await get("http://index.local/subfolder2/");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, "<html><body>subfolder2/override.html</body></html>\n");
-		strictEqual(actual.headers["content-type"], "text/html");
+		const actual = await fetch("http://index.local/subfolder2/", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(actual.headers.get("content-type"), "text/html");
+		strictEqual(await actual.text(), "<html><body>subfolder2/override.html</body></html>\n");
 	});
 
 	it("Multiple values", async function () {
-		this.slow(5000);
-		this.timeout(5000);
-		const actual = await get("http://index.local/subfolder3/");
-		strictEqual(actual.statusCode, 200);
-		strictEqual(actual.body, "<html><body>subfolder3/fallback.html</body></html>\n");
-		strictEqual(actual.headers["content-type"], "text/html");
+		const actual = await fetch("http://index.local/subfolder3/", {redirect: "manual"});
+		strictEqual(actual.status, 200);
+		strictEqual(actual.headers.get("content-type"), "text/html");
+		strictEqual(await actual.text(), "<html><body>subfolder3/fallback.html</body></html>\n");
 	});
 
 	it(`Autoindex on`, async function () {
-		this.slow(5000);
-		this.timeout(5000);
-		const actual = await get("http://index.local/subfolder4/");
-		strictEqual(actual.statusCode, 200, "Status code");
-		strictEqual(String(actual.body).includes(`<a href="file1.html">`), true, "Links to file1");
-		strictEqual(String(actual.body).includes(`<a href="file2.html">`), true, "Links to file2");
-		strictEqual(actual.headers["content-type"], "text/html");
+		const actual = await fetch("http://index.local/subfolder4/", {redirect: "manual"});
+		strictEqual(actual.status, 200, "Status code");
+		strictEqual(actual.headers.get("content-type"), "text/html");
+		const body = await actual.text();
+		strictEqual(body.includes(`<a href="file1.html">`), true, "Links to file1");
+		strictEqual(body.includes(`<a href="file2.html">`), true, "Links to file2");
 	});
 
 	it(`Autoindex off`, async function () {
-		this.slow(5000);
-		this.timeout(5000);
-		const actual = await get("http://index.local/subfolder5/");
-		strictEqual(actual.statusCode, 403, "Status code");
+		const actual = await fetch("http://index.local/subfolder5/", {redirect: "manual"});
+		strictEqual(actual.status, 403, "Status code");
 	});
 });
