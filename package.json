@@ -1,7 +1,7 @@
 {
   "private": true,
   "devDependencies": {
-    "mocha": "9.0.1",
+    "mocha": "9.0.2",
     "node-fetch": "2.6.1"
   },
   "scripts": {
