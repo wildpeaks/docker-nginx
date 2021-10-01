@@ -1,8 +1,6 @@
 /* eslint-env node, mocha */
-/* eslint-disable prefer-arrow-callback */
-"use strict";
-const {strictEqual} = require("assert");
-const fetch = require("node-fetch");
+import {strictEqual} from "assert";
+import fetch from "node-fetch";
 
 describe("Redirection", function () {
 	it("/redirection", async function () {

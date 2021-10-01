@@ -1,10 +1,7 @@
 /* eslint-env node, mocha */
-/* eslint-disable prefer-arrow-callback */
-"use strict";
-const {strictEqual, deepStrictEqual} = require("assert");
-const {readdir, readFile} = require("fs/promises");
-const fetch = require("node-fetch");
-
+import {strictEqual, deepStrictEqual} from "assert";
+import {readdir, readFile} from "fs/promises";
+import fetch from"node-fetch";
 
 describe("Logs", function () {
 	it("Custom filepaths", async function () {
