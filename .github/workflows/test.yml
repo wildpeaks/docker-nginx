@@ -17,14 +17,14 @@ jobs:
 
     - name: Build
       run: |
-        docker-compose build src -f ./docker-compose.test.yml
-        docker-compose up -f ./docker-compose.test.yml -d
+        docker-compose -f docker-compose.test.yml build src
+        docker-compose -f docker-compose.test.yml up -d
 
     - name: Test
       run: |
-        docker-compose exec -f ./docker-compose.test.yml -T test npm install --prefer-offline --no-audit --no-fund --no-update-notifier
-        docker-compose exec -f ./docker-compose.test.yml -T test npm run test
+        docker-compose -f docker-compose.test.yml exec -T test npm install --prefer-offline --no-audit --no-fund --no-update-notifier
+        docker-compose -f docker-compose.test.yml exec -T test npm run test
 
     - name: Cleanup
-      run: docker-compose down -f ./docker-compose.test.yml --volumes
+      run: docker-compose -f docker-compose.test.yml down --volumes
       if: always()
