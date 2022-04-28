@@ -2,7 +2,7 @@
   "private": true,
   "devDependencies": {
     "mocha": "9.2.2",
-    "node-fetch": "3.2.3"
+    "node-fetch": "3.2.4"
   },
   "scripts": {
     "test": "mocha test/mocha/*.test.mjs --timeout 5000"
