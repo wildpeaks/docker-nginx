@@ -1,5 +1,5 @@
 {
-  "nginx": "1.18.0-0ubuntu1.3",
-  "openssl": "1.1.1f-1ubuntu2.16",
-  "ca-certificates": "20211016~20.04.1"
+  "nginx": "1.18.0-0ubuntu1.4",
+  "openssl": "1.1.1f-1ubuntu2.17",
+  "ca-certificates": "20211016ubuntu0.20.04.1"
 }

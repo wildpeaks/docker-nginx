@@ -1,8 +1,8 @@
 {
   "private": true,
   "devDependencies": {
-    "mocha": "10.1.0",
-    "node-fetch": "3.2.10"
+    "mocha": "10.2.0",
+    "node-fetch": "3.3.1"
   },
   "scripts": {
     "test": "mocha test/mocha/*.test.mjs --timeout 5000"
